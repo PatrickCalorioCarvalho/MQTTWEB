@@ -3,27 +3,46 @@
 }
 <h1>MQTT View WEB</h1>
 
-<div id="frase"></div>
+<div class"row">
+    <div id="body"></div>
+</div>
+    <script>
+        // Função responsável por atualizar as frases
+        function atualizar() {
+            // Fazendo requisição AJAX
+            $.post('Home/atualizar', function (mqtt) {
+                $('#body').html("");
+                $.each(mqtt, function (i, mqtt) {
+                    // Exibindo frase
+                    if (mqtt.isPublish) {
+                        $('#body').append(
+                            '<div class="col-md-2">' +
+                            '<div class="panel panel-primary">' +
+                            '<div class="panel-heading">' + mqtt.titulo + '</div>' +
+                            '<div class="panel-body"><h2> ' + (mqtt.valor == 1 ? 'ON' : 'OFF') + '</h2> </div>' +
+                            '<div class="panel-footer"> <center>' + mqtt.local + '</center> </div>' +
+                            '</div > ' +
+                            '</div > ');
+                    } else {
+                        $('#body').append(
+                            '<div class="col-md-2">'+
+                                '<div class="panel panel-info">' +
+                                    '<div class="panel-heading">' + mqtt.titulo + '</div>' +
+                                    '<div class="panel-body"><h2> ' + mqtt.valor + '</h2> </div>' +
+                                    '<div class="panel-footer"> <center>' + mqtt.local + '</center> </div>' +
+                                '</div > '+
+                            '</div > ');
+                    }
+                });
+            }, 'JSON');
+        }
 
-<script>
-    // Função responsável por atualizar as frases
-    function atualizar() {
-        // Fazendo requisição AJAX
-        $.post('Home/atualizar', function (mqtt) {
-            $('#frase').html("");
-            $.each(mqtt, function (i, mqtt) {
-                // Exibindo frase
-                $('#frase').append(mqtt.topico + ' &nbsp;&nbsp;&nbsp;&nbsp; <h4>' + mqtt.menssagem +'</h4>');
-            });
-        }, 'JSON');
-    }
+        // Definindo intervalo que a função será chamada
+        setInterval("atualizar()", 100);
 
-    // Definindo intervalo que a função será chamada
-    setInterval("atualizar()", 100);
-
-    // Quando carregar a página
-    $(function () {
-        // Faz a primeira atualização
-        atualizar();
-    });
-</script>
+        // Quando carregar a página
+        $(function () {
+            // Faz a primeira atualização
+            atualizar();
+        });
+    </script>

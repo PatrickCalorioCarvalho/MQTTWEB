@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MQTTWEB.Models;
@@ -18,7 +19,17 @@ namespace MQTTWEB.Controllers
         [HttpPost]
         public JsonResult atualizar()
         {
-            return Json(mqtt.OrderBy(x=>x.Topico));
+            try
+            {
+                return Json(mqtt.OrderBy(x => x.titulo).OrderBy(x => x.local));
+            }
+            catch (Exception)
+            {
+            
+            }
+            return null;
+
+
         }
         public IActionResult Index()
         {
@@ -32,17 +43,30 @@ namespace MQTTWEB.Controllers
 
         private void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
-            MQTT novo = new MQTT() { Topico = e.Topic, Menssagem = Encoding.UTF8.GetString(e.Message) };
             try
             {
-                if (mqtt.Select(x => x.Topico).Contains(e.Topic))
-                    mqtt.Remove(mqtt.Where(x => x.Topico == e.Topic).First());
-                if (novo.Menssagem != string.Empty)
+                Regex rgx = new Regex(@"/[A-Za-z0-9]*/[A-Za-z0-9]*/[A-Za-z0-9]*");
+                if (rgx.IsMatch(e.Topic))
+                {
+                    var topicos = e.Topic.Split('/');
+
+                    MQTT novo = new MQTT()
+                    {
+                        topico = e.Topic,
+                        titulo = topicos[2],
+                        local = topicos[1],
+                        isPublish = topicos[3] == "label" ? false : true,
+                        valor = Encoding.UTF8.GetString(e.Message)
+                    };
+
+                    if (mqtt.Select(x => x.topico).Contains(e.Topic))
+                        mqtt.Remove(mqtt.Where(x => x.topico == e.Topic).First());
                     mqtt.Add(novo);
+                }
             }
             catch (Exception)
             {
-                mqtt.Clear();
+
             }
 
         }

@@ -9,12 +9,21 @@ namespace MQTTWEB.Models
     {
         public MQTT()
         {
-            Topico = string.Empty;
-            Menssagem = string.Empty;
+            titulo = string.Empty;
+            local = string.Empty;
+            isPublish = false;
+            valor = string.Empty;
+            topico = string.Empty;
         }
-        public string Topico { get; set; }
+        public string topico { get; set; }
 
-        public string Menssagem { get; set; }
+        public string titulo { get; set; }
+
+        public string local { get; set; }
+
+        public bool isPublish { get; set; }
+
+        public string valor { get; set; }
 
     }
 }
