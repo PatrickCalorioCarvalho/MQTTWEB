@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<h1>MQTT View WEB</h1>
+
+<div id="frase"></div>
+
+<script>
+    // Função responsável por atualizar as frases
+    function atualizar() {
+        // Fazendo requisição AJAX
+        $.post('Home/atualizar', function (mqtt) {
+            $('#frase').html("");
+            $.each(mqtt, function (i, mqtt) {
+                // Exibindo frase
+                $('#frase').append(mqtt.topico + ' &nbsp;&nbsp;&nbsp;&nbsp; <h4>' + mqtt.menssagem +'</h4>');
+            });
+        }, 'JSON');
+    }
+
+    // Definindo intervalo que a função será chamada
+    setInterval("atualizar()", 100);
+
+    // Quando carregar a página
+    $(function () {
+        // Faz a primeira atualização
+        atualizar();
+    });
+</script>
